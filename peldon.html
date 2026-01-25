@@ -140,6 +140,7 @@ const isStandalone =
 const message = document.getElementById("message");
 const startScreen = document.getElementById("startScreen");
 const content = document.getElementById("content");
+
 const mensajesNo = [
     "¿Segura? 😢",
     "Piénsalo otra vez...",
@@ -179,17 +180,27 @@ function iniciarExperiencia() {
     startScreen.style.display = "flex";
 
     startScreen.addEventListener("click", () => {
-    startScreen.style.display = "none";
-    content.style.display = "flex";
+        startScreen.style.display = "none";
+        content.style.display = "flex";
 
-    // 👉 PEDIR PERMISO DE NOTIFICACIONES (iOS SAFE)
-    if ("Notification" in window && Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
+        // 🔓 DESBLOQUEO DE AUDIOS (ÚNICO CAMBIO)
+        bgAudio.volume = 0;
+        finalAudio.volume = 0;
 
-    bgAudio.play().catch(()=>{});
-    crearCarta();
-});
+        bgAudio.play().then(() => {
+            bgAudio.pause();
+            bgAudio.currentTime = 0;
+            bgAudio.volume = 1;
+        }).catch(()=>{});
+
+        finalAudio.play().then(() => {
+            finalAudio.pause();
+            finalAudio.currentTime = 0;
+            finalAudio.volume = 1;
+        }).catch(()=>{});
+
+        crearCarta();
+    });
 }
 
 function crearCarta() {
@@ -203,15 +214,19 @@ function crearCarta() {
         </div>
     `;
 
+    bgAudio.play().catch(()=>{});
+
     document.getElementById("noBtn").onclick = () => {
-    if (Notification.permission === "granted") {
-        const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
-        new Notification(msg);
-    }
-};
+        if (Notification.permission === "granted") {
+            const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
+            new Notification(msg);
+        }
+    };
 
     document.getElementById("yesBtn").onclick = () => {
         bgAudio.pause();
+        bgAudio.currentTime = 0;
+
         finalAudio.currentTime = 0;
         finalAudio.play().catch(()=>{});
 
