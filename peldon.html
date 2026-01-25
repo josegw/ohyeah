@@ -140,6 +140,12 @@ const isStandalone =
 const message = document.getElementById("message");
 const startScreen = document.getElementById("startScreen");
 const content = document.getElementById("content");
+const mensajesNo = [
+    "¿Segura? 😢",
+    "Piénsalo otra vez...",
+    "No hagas eso 💔",
+    "Mi corazón no aguanta 😔"
+];
 
 const bgAudio = document.getElementById("bgAudio");
 const finalAudio = document.getElementById("finalAudio");
@@ -198,10 +204,11 @@ function crearCarta() {
     `;
 
     document.getElementById("noBtn").onclick = () => {
-        if (Notification.permission === "granted") {
-            new Notification("¿Segura? 😢");
-        }
-    };
+    if (Notification.permission === "granted") {
+        const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
+        new Notification(msg);
+    }
+};
 
     document.getElementById("yesBtn").onclick = () => {
         bgAudio.pause();
