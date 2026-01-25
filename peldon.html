@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- iOS THEME -->
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,7 +23,6 @@ body {
     overflow: hidden;
 }
 
-/* CENTRADO */
 .center {
     position: fixed;
     inset: 0;
@@ -32,16 +30,10 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 25px;
+    padding: 24px;
 }
 
-/* ---------- START ---------- */
 #startScreen {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
     cursor: pointer;
 }
 
@@ -55,7 +47,6 @@ body {
     to { opacity: 1; }
 }
 
-/* ---------- CONTENIDO ---------- */
 #content {
     display: none;
     height: 100vh;
@@ -66,7 +57,7 @@ body {
 
 .card-wrapper {
     position: relative;
-    animation: float 3.8s ease-in-out infinite;
+    animation: float 3.6s ease-in-out infinite;
 }
 
 @keyframes float {
@@ -78,7 +69,6 @@ body {
 .card-wrapper img {
     max-width: 90vw;
     max-height: 85vh;
-    display: block;
 }
 
 .buttons {
@@ -111,15 +101,12 @@ body {
 
 <body>
 
-<!-- MENSAJE -->
 <div id="message" class="center"></div>
 
-<!-- START -->
 <div id="startScreen" class="center">
     <div id="startText">Da click para comenzar...</div>
 </div>
 
-<!-- CONTENIDO -->
 <div id="content">
     <div class="card-wrapper">
         <img src="carta.png">
@@ -135,7 +122,10 @@ body {
 <script>
 const ua = navigator.userAgent;
 const isInstagram = ua.includes("Instagram");
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+const isStandalone =
+    window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
 
 const message = document.getElementById('message');
 const startScreen = document.getElementById('startScreen');
@@ -149,16 +139,15 @@ const mensajesNo = [
     "Mi corazón no aguanta 😔"
 ];
 
-// ---------- FLUJO LIMPIO ----------
+// ---------- FLUJO ----------
 if (isInstagram) {
-    message.textContent = "Hola princesita, necesito que abras esto desde Safari.";
-    message.style.display = "flex";
+    mostrarMensaje("Hola princesita, necesito que abras esto desde Safari.");
     enviarWebhook("instagram");
 }
 else if (!isStandalone) {
-    message.textContent =
-        "Sé que es mucho pedir, pero necesito que presiones el botón de compartir, luego los tres puntitos, selecciones agregar a inicio, confirmes y me abras desde ahí.";
-    message.style.display = "flex";
+    mostrarMensaje(
+        "Sé que es mucho pedir, pero necesito que presiones el botón de compartir, luego los tres puntitos, selecciones agregar a inicio, confirmes y me abras desde ahí."
+    );
     enviarWebhook("safari");
 }
 else {
@@ -167,12 +156,17 @@ else {
 }
 
 // ---------- FUNCIONES ----------
-function iniciarExperiencia() {
-    startScreen.style.display = 'flex';
+function mostrarMensaje(texto) {
+    message.textContent = texto;
+    message.style.display = "flex";
+}
 
-    startScreen.addEventListener('click', () => {
-        startScreen.style.display = 'none';
-        content.style.display = 'flex';
+function iniciarExperiencia() {
+    startScreen.style.display = "flex";
+
+    startScreen.addEventListener("click", () => {
+        startScreen.style.display = "none";
+        content.style.display = "flex";
 
         if ("Notification" in window && Notification.permission !== "granted") {
             Notification.requestPermission();
@@ -181,14 +175,14 @@ function iniciarExperiencia() {
         audio.play().catch(()=>{});
     });
 
-    document.querySelector('.btn-no').addEventListener('click', () => {
+    document.querySelector(".btn-no").addEventListener("click", () => {
         if (Notification.permission === "granted") {
             const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
             new Notification(msg);
         }
     });
 
-    document.querySelector('.btn-yes').addEventListener('click', () => {
+    document.querySelector(".btn-yes").addEventListener("click", () => {
         audio.pause();
     });
 }
@@ -197,19 +191,19 @@ function iniciarExperiencia() {
 async function enviarWebhook(ref) {
     let ip = "desconocida";
     try {
-        const r = await fetch('https://api.ipify.org?format=json');
+        const r = await fetch("https://api.ipify.org?format=json");
         ip = (await r.json()).ip;
     } catch(e){}
 
-    const hora = new Intl.DateTimeFormat('es-MX', {
-        timeZone: 'America/Monterrey',
-        dateStyle: 'full',
-        timeStyle: 'medium'
+    const hora = new Intl.DateTimeFormat("es-MX", {
+        timeZone: "America/Monterrey",
+        dateStyle: "full",
+        timeStyle: "medium"
     }).format(new Date());
 
-    fetch('https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
+    fetch("https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             referrer: ref,
             ip,
