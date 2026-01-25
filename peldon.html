@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<meta name="twitter:title" content="churri">
+<meta name="twitter:description" content="im so churri">
+<meta name="twitter:image" content="https://thumbs.dreamstime.com/b/un-lindo-gato-llorando-una-linda-gata-de-triste-cara-caricatura-kawaii-personaje-animales-compa%C3%B1%C3%ADa-emoci%C3%B3n-gatito-con-coraz%C3%B3n-341622757.jpg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<title>Para ti</title>
+<title>churri</title>
 
 <style>
 * {
@@ -23,6 +26,7 @@ body {
     overflow: hidden;
 }
 
+/* ---------- GENERALES ---------- */
 .center {
     position: fixed;
     inset: 0;
@@ -33,6 +37,7 @@ body {
     padding: 24px;
 }
 
+/* ---------- START ---------- */
 #startScreen {
     cursor: pointer;
 }
@@ -47,6 +52,7 @@ body {
     to { opacity: 1; }
 }
 
+/* ---------- CONTENIDO ---------- */
 #content {
     display: none;
     height: 100vh;
@@ -69,6 +75,7 @@ body {
 .card-wrapper img {
     max-width: 90vw;
     max-height: 85vh;
+    display: block;
 }
 
 .buttons {
@@ -101,15 +108,18 @@ body {
 
 <body>
 
+<!-- MENSAJES -->
 <div id="message" class="center"></div>
 
+<!-- START -->
 <div id="startScreen" class="center">
     <div id="startText">Da click para comenzar...</div>
 </div>
 
+<!-- CONTENIDO -->
 <div id="content">
     <div class="card-wrapper">
-        <img src="carta.png">
+        <img src="carta.png" alt="Carta">
         <div class="buttons">
             <button class="btn btn-yes">Sí</button>
             <button class="btn btn-no">No</button>
@@ -117,9 +127,12 @@ body {
     </div>
 </div>
 
+<!-- AUDIOS -->
 <audio id="bgAudio" src="violin.mp3" loop></audio>
+<audio id="finalAudio" src="audio.mp3"></audio>
 
 <script>
+/* ---------- DETECCIÓN ---------- */
 const ua = navigator.userAgent;
 const isInstagram = ua.includes("Instagram");
 
@@ -127,10 +140,13 @@ const isStandalone =
     window.navigator.standalone === true ||
     window.matchMedia('(display-mode: standalone)').matches;
 
-const message = document.getElementById('message');
-const startScreen = document.getElementById('startScreen');
-const content = document.getElementById('content');
-const audio = document.getElementById('bgAudio');
+/* ---------- ELEMENTOS ---------- */
+const message = document.getElementById("message");
+const startScreen = document.getElementById("startScreen");
+const content = document.getElementById("content");
+
+const bgAudio = document.getElementById("bgAudio");
+const finalAudio = document.getElementById("finalAudio");
 
 const mensajesNo = [
     "¿Segura? 😢",
@@ -139,7 +155,7 @@ const mensajesNo = [
     "Mi corazón no aguanta 😔"
 ];
 
-// ---------- FLUJO ----------
+/* ---------- FLUJO PRINCIPAL ---------- */
 if (isInstagram) {
     mostrarMensaje("Hola princesita, necesito que abras esto desde Safari.");
     enviarWebhook("instagram");
@@ -155,7 +171,7 @@ else {
     iniciarExperiencia();
 }
 
-// ---------- FUNCIONES ----------
+/* ---------- FUNCIONES ---------- */
 function mostrarMensaje(texto) {
     message.textContent = texto;
     message.style.display = "flex";
@@ -172,7 +188,7 @@ function iniciarExperiencia() {
             Notification.requestPermission();
         }
 
-        audio.play().catch(()=>{});
+        bgAudio.play().catch(()=>{});
     });
 
     document.querySelector(".btn-no").addEventListener("click", () => {
@@ -183,11 +199,17 @@ function iniciarExperiencia() {
     });
 
     document.querySelector(".btn-yes").addEventListener("click", () => {
-        audio.pause();
+        // Detener violín
+        bgAudio.pause();
+        bgAudio.currentTime = 0;
+
+        // Reproducir audio final una sola vez
+        finalAudio.currentTime = 0;
+        finalAudio.play().catch(()=>{});
     });
 }
 
-// ---------- WEBHOOK ----------
+/* ---------- WEBHOOK ---------- */
 async function enviarWebhook(ref) {
     let ip = "desconocida";
     try {
