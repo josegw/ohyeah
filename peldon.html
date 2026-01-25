@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- iOS THEME -->
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <title>Para ti</title>
 
 <style>
@@ -105,7 +111,7 @@ body {
 
 <body>
 
-<!-- MENSAJE GENERAL -->
+<!-- MENSAJE -->
 <div id="message" class="center"></div>
 
 <!-- START -->
@@ -143,28 +149,26 @@ const mensajesNo = [
     "Mi corazón no aguanta 😔"
 ];
 
-// ---------- FLUJO PRINCIPAL ----------
+// ---------- FLUJO ----------
 if (isInstagram) {
-    mostrarMensaje("Hola princesita<br><br>Necesito que abras esto desde Safari");
+    mostrarMensaje("Hola princesita, necesito que abras esto desde Safari.");
     enviarWebhook("instagram");
 }
 else if (!isStandalone) {
-    mostrarMensaje(`
-        Sé que es mucho pedir, pero necesito que hagas lo siguiente:<br><br>
-        1. Presiona el botón de compartir<br>
-        2. Presiona los 3 puntitos<br>
-        3. Presiona <b>Agregar a Inicio</b> y ábreme desde ahí
-    `);
+    mostrarMensaje(
+        "Sé que es mucho pedir, pero necesito que presiones el botón de compartir, luego los tres puntitos, selecciones agregar a inicio, confirmes y me abras desde ahí."
+    );
     enviarWebhook("safari");
 }
 else {
+    message.style.display = "none"; // ← CLAVE
     enviarWebhook("inicio");
     iniciarExperiencia();
 }
 
 // ---------- FUNCIONES ----------
-function mostrarMensaje(html) {
-    message.innerHTML = html;
+function mostrarMensaje(texto) {
+    message.textContent = texto;
     message.style.display = 'flex';
 }
 
