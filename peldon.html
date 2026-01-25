@@ -13,7 +13,7 @@
 
     body {
         margin: 0;
-        background: #f5f5f5;
+        background: black;
         overflow: hidden;
     }
 
@@ -46,57 +46,55 @@
         height: 100vh;
         width: 100%;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
     }
 
-    /* Imagen flotante */
-    .image-container {
+    /* Contenedor de la carta */
+    .card-wrapper {
+        position: relative;
         animation: float 5s ease-in-out infinite;
     }
 
     @keyframes float {
         0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
+        50% { transform: translateY(-8px); }
         100% { transform: translateY(0px); }
     }
 
-    .image-container img {
+    .card-wrapper img {
         max-width: 90vw;
-        max-height: 65vh;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        max-height: 85vh;
+        display: block;
     }
 
-    /* ---------- BOTONES ---------- */
+    /* ---------- BOTONES SUPERPUESTOS ---------- */
     .buttons {
-        margin-top: 25px;
+        position: absolute;
+        bottom: 9%; /* AJUSTABLE según tu imagen */
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
         gap: 20px;
     }
 
     .btn {
-        min-width: 110px;
-        padding: 12px 20px;
+        padding: 10px 22px;
+        border-radius: 22px;
         font-size: 1rem;
-        border-radius: 25px;
         border: none;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, opacity 0.2s ease;
     }
 
     .btn-yes {
         background: #f4c2c2;
         color: #5a2a2a;
-        box-shadow: 0 5px 12px rgba(244, 194, 194, 0.6);
     }
 
     .btn-no {
         background: #e0e0e0;
-        color: #444;
-        box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+        color: #333;
     }
 
     .btn:active {
@@ -113,13 +111,13 @@
 </div>
 
 <div id="content">
-    <div class="image-container">
+    <div class="card-wrapper">
         <img src="carta.png" alt="Carta">
-    </div>
 
-    <div class="buttons">
-        <button class="btn btn-yes">Sí</button>
-        <button class="btn btn-no">No</button>
+        <div class="buttons">
+            <button class="btn btn-yes">Sí</button>
+            <button class="btn btn-no">No</button>
+        </div>
     </div>
 </div>
 
