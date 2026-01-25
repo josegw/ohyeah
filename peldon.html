@@ -28,7 +28,7 @@ body {
 .center {
     position: fixed;
     inset: 0;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -149,29 +149,24 @@ const mensajesNo = [
     "Mi corazón no aguanta 😔"
 ];
 
-// ---------- FLUJO ----------
+// ---------- FLUJO LIMPIO ----------
 if (isInstagram) {
-    mostrarMensaje("Hola princesita, necesito que abras esto desde Safari.");
+    message.textContent = "Hola princesita, necesito que abras esto desde Safari.";
+    message.style.display = "flex";
     enviarWebhook("instagram");
 }
 else if (!isStandalone) {
-    mostrarMensaje(
-        "Sé que es mucho pedir, pero necesito que presiones el botón de compartir, luego los tres puntitos, selecciones agregar a inicio, confirmes y me abras desde ahí."
-    );
+    message.textContent =
+        "Sé que es mucho pedir, pero necesito que presiones el botón de compartir, luego los tres puntitos, selecciones agregar a inicio, confirmes y me abras desde ahí.";
+    message.style.display = "flex";
     enviarWebhook("safari");
 }
 else {
-    message.style.display = "none"; // ← CLAVE
     enviarWebhook("inicio");
     iniciarExperiencia();
 }
 
 // ---------- FUNCIONES ----------
-function mostrarMensaje(texto) {
-    message.textContent = texto;
-    message.style.display = 'flex';
-}
-
 function iniciarExperiencia() {
     startScreen.style.display = 'flex';
 
