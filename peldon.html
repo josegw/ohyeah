@@ -173,12 +173,17 @@ function iniciarExperiencia() {
     startScreen.style.display = "flex";
 
     startScreen.addEventListener("click", () => {
-        startScreen.style.display = "none";
-        content.style.display = "flex";
+    startScreen.style.display = "none";
+    content.style.display = "flex";
 
-        bgAudio.play().catch(()=>{});
-        crearCarta();
-    });
+    // 👉 PEDIR PERMISO DE NOTIFICACIONES (iOS SAFE)
+    if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    bgAudio.play().catch(()=>{});
+    crearCarta();
+});
 }
 
 function crearCarta() {
