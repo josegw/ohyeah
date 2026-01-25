@@ -117,8 +117,8 @@ body {
 
 <div id="content"></div>
 
-<audio id="bgAudio" src="violin.mp3" loop></audio>
-<audio id="finalAudio" src="audio.mp3"></audio>
+<audio id="bgAudio" src="violin.mp3" loop playsinline preload="auto"></audio>
+<audio id="finalAudio" src="audio.mp3" playsinline preload="auto"></audio>
 
 <script>
 const ua = navigator.userAgent;
@@ -169,19 +169,19 @@ function iniciarExperiencia() {
         startScreen.style.display = "none";
         content.style.display = "flex";
 
-        // ✅ PERMISOS (iOS CORRECTO)
         if ("Notification" in window && Notification.permission !== "granted") {
             Notification.requestPermission();
         }
 
-        // ✅ AUDIO (iOS CORRECTO)
-        bgAudio.pause();
+        // 🔒 DESBLOQUEO DE AUDIOS (iOS)
         bgAudio.currentTime = 0;
-        bgAudio.load();
         bgAudio.play().catch(()=>{});
 
+        finalAudio.currentTime = 0;
+        finalAudio.pause();
+
         crearCarta();
-    });
+    }, { once: true });
 }
 
 function crearCarta() {
@@ -203,9 +203,12 @@ function crearCarta() {
     };
 
     document.getElementById("yesBtn").onclick = () => {
+        // 🎻 PAUSA VIOLÍN
         bgAudio.pause();
         bgAudio.currentTime = 0;
 
+        // 🔊 AUDIO FINAL (GARANTIZADO)
+        finalAudio.pause();
         finalAudio.currentTime = 0;
         finalAudio.play().catch(()=>{});
 
