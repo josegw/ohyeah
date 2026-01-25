@@ -175,6 +175,9 @@ function iniciarExperiencia() {
         }
 
         // ✅ AUDIO (iOS CORRECTO)
+        bgAudio.pause();
+        bgAudio.currentTime = 0;
+        bgAudio.load();
         bgAudio.play().catch(()=>{});
 
         crearCarta();
