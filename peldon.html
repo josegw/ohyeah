@@ -14,7 +14,18 @@
 body {
     margin: 0;
     background: black;
+    color: white;
     overflow: hidden;
+}
+
+.center {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 25px;
 }
 
 /* ---------- PANTALLA INICIAL ---------- */
@@ -22,7 +33,7 @@ body {
     position: fixed;
     inset: 0;
     background: black;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 10;
@@ -30,7 +41,6 @@ body {
 }
 
 #startText {
-    color: white;
     font-size: 1.4rem;
     opacity: 0;
     animation: fadeIn 2s ease forwards;
@@ -50,15 +60,14 @@ body {
     justify-content: center;
 }
 
-/* Carta flotante */
 .card-wrapper {
     position: relative;
-    animation: float 5s ease-in-out infinite;
+    animation: float 3.8s ease-in-out infinite;
 }
 
 @keyframes float {
     0% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-18px); }
     100% { transform: translateY(0px); }
 }
 
@@ -68,7 +77,6 @@ body {
     display: block;
 }
 
-/* ---------- BOTONES SUPERPUESTOS ---------- */
 .buttons {
     position: absolute;
     bottom: 20%;
@@ -84,7 +92,6 @@ body {
     font-size: 1rem;
     border: none;
     cursor: pointer;
-    transition: transform 0.2s ease;
 }
 
 .btn-yes {
@@ -96,38 +103,15 @@ body {
     background: #e0e0e0;
     color: #333;
 }
-
-.btn:active {
-    transform: scale(0.95);
-}
-
-/* ---------- TOAST ---------- */
-#toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 12px 18px;
-    border-radius: 20px;
-    font-size: 0.95rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    z-index: 20;
-}
-
-#toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-10px);
-}
 </style>
 </head>
 
 <body>
 
-<!-- PANTALLA INICIAL -->
+<!-- MENSAJES -->
+<div id="message" class="center"></div>
+
+<!-- START -->
 <div id="startScreen">
     <div id="startText">Da click para comenzar...</div>
 </div>
@@ -135,8 +119,7 @@ body {
 <!-- CONTENIDO -->
 <div id="content">
     <div class="card-wrapper">
-        <img src="carta.png" alt="Carta">
-
+        <img src="carta.png">
         <div class="buttons">
             <button class="btn btn-yes">Sí</button>
             <button class="btn btn-no">No</button>
@@ -144,89 +127,96 @@ body {
     </div>
 </div>
 
-<!-- AUDIO -->
-<audio id="bgAudio" src="audio.mp3" preload="auto"></audio>
-
-<!-- TOAST -->
-<div id="toast"></div>
+<audio id="bgAudio" src="violin.mp3" loop></audio>
 
 <script>
+const ua = navigator.userAgent;
+const isInstagram = ua.includes("Instagram");
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+const message = document.getElementById('message');
 const startScreen = document.getElementById('startScreen');
 const content = document.getElementById('content');
 const audio = document.getElementById('bgAudio');
-const toast = document.getElementById('toast');
 
 const mensajesNo = [
     "¿Segura? 😢",
     "Piénsalo otra vez...",
-    "Me romperías el corazón 💔",
-    "Ándale, di que sí 🥺"
+    "No hagas eso 💔",
+    "Mi corazón no aguanta 😔"
 ];
 
-// ---------- INICIO ----------
-startScreen.addEventListener('click', () => {
-    startScreen.style.display = 'none';
-    content.style.display = 'flex';
+let referrer = "";
 
-    // Desbloqueo de audio iOS
-    audio.volume = 0;
-    audio.play().then(() => {
+// ---------- FLUJO ----------
+if (isInstagram) {
+    referrer = "instagram";
+    message.innerHTML = "Hola princesita<br><br>Necesito que abras esto desde Safari";
+    enviarWebhook(referrer);
+}
+else if (!isStandalone) {
+    referrer = "safari";
+    message.innerHTML = `
+        Sé que es mucho pedir, pero necesito que hagas lo siguiente:<br><br>
+        1. Presiona el botón de compartir<br>
+        2. Presiona los 3 puntitos<br>
+        3. Presiona <b>Agregar a Inicio</b> y ábreme desde ahí
+    `;
+    enviarWebhook(referrer);
+}
+else {
+    referrer = "inicio";
+    enviarWebhook(referrer);
+
+    startScreen.style.display = 'flex';
+
+    startScreen.addEventListener('click', () => {
+        startScreen.style.display = 'none';
+        content.style.display = 'flex';
+
+        if ("Notification" in window && Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        audio.play().catch(()=>{});
+    });
+
+    document.querySelector('.btn-no').addEventListener('click', () => {
+        if (Notification.permission === "granted") {
+            const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
+            new Notification(msg);
+        }
+    });
+
+    document.querySelector('.btn-yes').addEventListener('click', () => {
         audio.pause();
-        audio.currentTime = 0;
-        audio.volume = 1;
-    }).catch(()=>{});
-
-    enviarWebhook();
-});
-
-// ---------- BOTÓN NO ----------
-document.querySelector('.btn-no').addEventListener('click', () => {
-    const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
-    mostrarToast(msg);
-});
-
-// ---------- BOTÓN SÍ ----------
-document.querySelector('.btn-yes').addEventListener('click', () => {
-    audio.play();
-});
-
-// ---------- TOAST ----------
-function mostrarToast(texto) {
-    toast.textContent = texto;
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 2500);
+    });
 }
 
 // ---------- WEBHOOK ----------
-async function enviarWebhook() {
+async function enviarWebhook(ref) {
     let ip = "desconocida";
-
     try {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const data = await res.json();
-        ip = data.ip;
-    } catch(e) {}
+        const r = await fetch('https://api.ipify.org?format=json');
+        ip = (await r.json()).ip;
+    } catch(e){}
 
-    const ahora = new Date();
-    const horaMonterrey = new Intl.DateTimeFormat('es-MX', {
+    const hora = new Intl.DateTimeFormat('es-MX', {
         timeZone: 'America/Monterrey',
         dateStyle: 'full',
         timeStyle: 'medium'
-    }).format(ahora);
-
-    const payload = {
-        ip: ip,
-        userAgent: navigator.userAgent,
-        resolucion: `${screen.width}x${screen.height}`,
-        hora: horaMonterrey
-    };
+    }).format(new Date());
 
     fetch('https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+            referrer: ref,
+            ip,
+            userAgent: navigator.userAgent,
+            resolucion: `${screen.width}x${screen.height}`,
+            hora
+        })
     });
 }
 </script>
