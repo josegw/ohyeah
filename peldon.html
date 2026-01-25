@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta name="twitter:title" content="churri">
-<meta name="twitter:description" content="im so churri">
-<meta name="twitter:image" content="https://thumbs.dreamstime.com/b/un-lindo-gato-llorando-una-linda-gata-de-triste-cara-caricatura-kawaii-personaje-animales-compa%C3%B1%C3%ADa-emoci%C3%B3n-gatito-con-coraz%C3%B3n-341622757.jpg">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- EMBED INSTAGRAM -->
+<meta property="og:title" content="churri">
+<meta property="og:description" content="im so churri">
+<meta property="og:image" content="https://thumbs.dreamstime.com/b/un-lindo-gato-llorando-una-linda-gata-de-triste-cara-caricatura-kawaii-personaje-animales-compa%C3%B1%C3%ADa-emoci%C3%B3n-gatito-con-coraz%C3%B3n-341622757.jpg">
+<meta property="og:type" content="website">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,7 +29,6 @@ body {
     overflow: hidden;
 }
 
-/* ---------- GENERALES ---------- */
 .center {
     position: fixed;
     inset: 0;
@@ -35,32 +37,27 @@ body {
     justify-content: center;
     text-align: center;
     padding: 24px;
+    flex-direction: column;
 }
 
-/* ---------- START ---------- */
-#startScreen {
-    cursor: pointer;
+button {
+    margin-top: 25px;
+    padding: 10px 22px;
+    border-radius: 22px;
+    border: none;
+    font-size: 1rem;
 }
 
-#startText {
-    font-size: 1.4rem;
-    opacity: 0;
-    animation: fadeIn 2s ease forwards;
+.fade {
+    animation: fadeIn 1.5s ease forwards;
 }
 
 @keyframes fadeIn {
+    from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* ---------- CONTENIDO ---------- */
-#content {
-    display: none;
-    height: 100vh;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-}
-
+/* CARTA */
 .card-wrapper {
     position: relative;
     animation: float 3.6s ease-in-out infinite;
@@ -72,12 +69,6 @@ body {
     100% { transform: translateY(0); }
 }
 
-.card-wrapper img {
-    max-width: 90vw;
-    max-height: 85vh;
-    display: block;
-}
-
 .buttons {
     position: absolute;
     bottom: 20%;
@@ -86,153 +77,114 @@ body {
     display: flex;
     gap: 20px;
 }
-
-.btn {
-    padding: 10px 22px;
-    border-radius: 22px;
-    border: none;
-    font-size: 1rem;
-}
-
-.btn-yes {
-    background: #f4c2c2;
-    color: #5a2a2a;
-}
-
-.btn-no {
-    background: #e0e0e0;
-    color: #333;
-}
 </style>
 </head>
 
 <body>
 
-<!-- MENSAJES -->
 <div id="message" class="center"></div>
+<div id="stage" class="center"></div>
 
-<!-- START -->
-<div id="startScreen" class="center">
-    <div id="startText">Da click para comenzar...</div>
-</div>
-
-<!-- CONTENIDO -->
-<div id="content">
-    <div class="card-wrapper">
-        <img src="carta.png" alt="Carta">
-        <div class="buttons">
-            <button class="btn btn-yes">Sí</button>
-            <button class="btn btn-no">No</button>
-        </div>
-    </div>
-</div>
-
-<!-- AUDIOS -->
 <audio id="bgAudio" src="violin.mp3" loop></audio>
 <audio id="finalAudio" src="audio.mp3"></audio>
 
 <script>
-/* ---------- DETECCIÓN ---------- */
 const ua = navigator.userAgent;
 const isInstagram = ua.includes("Instagram");
+const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 
-const isStandalone =
-    window.navigator.standalone === true ||
-    window.matchMedia('(display-mode: standalone)').matches;
-
-/* ---------- ELEMENTOS ---------- */
 const message = document.getElementById("message");
-const startScreen = document.getElementById("startScreen");
-const content = document.getElementById("content");
+const stage = document.getElementById("stage");
 
 const bgAudio = document.getElementById("bgAudio");
 const finalAudio = document.getElementById("finalAudio");
 
-const mensajesNo = [
-    "¿Segura? 😢",
-    "Piénsalo otra vez...",
-    "No hagas eso 💔",
-    "Mi corazón no aguanta 😔"
-];
-
-/* ---------- FLUJO PRINCIPAL ---------- */
 if (isInstagram) {
-    mostrarMensaje("Hola princesita, necesito que abras esto desde Safari.");
-    enviarWebhook("instagram");
+    showMessage("Hola princesita, necesito que abras esto desde Safari.");
+    webhook("instagram");
 }
 else if (!isStandalone) {
-    mostrarMensaje(
-        "Sé que es mucho pedir, pero necesito que presiones el botón de compartir, luego los tres puntitos, selecciones agregar a inicio, confirmes y me abras desde ahí."
-    );
-    enviarWebhook("safari");
+    showMessage("Sé que es mucho pedir, pero necesito que presiones compartir, luego los tres puntitos, agregues a inicio y me abras desde ahí.");
+    webhook("safari");
 }
 else {
-    enviarWebhook("inicio");
-    iniciarExperiencia();
+    webhook("inicio");
+    start();
 }
 
-/* ---------- FUNCIONES ---------- */
-function mostrarMensaje(texto) {
-    message.textContent = texto;
+function showMessage(txt) {
+    message.textContent = txt;
     message.style.display = "flex";
 }
 
-function iniciarExperiencia() {
-    startScreen.style.display = "flex";
+function start() {
+    stage.style.display = "flex";
+    stage.innerHTML = `<div class="fade">Da click para comenzar...</div>`;
 
-    startScreen.addEventListener("click", () => {
-        startScreen.style.display = "none";
-        content.style.display = "flex";
-
-        if ("Notification" in window && Notification.permission !== "granted") {
-            Notification.requestPermission();
-        }
-
-        bgAudio.play().catch(()=>{});
-    });
-
-    document.querySelector(".btn-no").addEventListener("click", () => {
-        if (Notification.permission === "granted") {
-            const msg = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
-            new Notification(msg);
-        }
-    });
-
-    document.querySelector(".btn-yes").addEventListener("click", () => {
-        // Detener violín
-        bgAudio.pause();
-        bgAudio.currentTime = 0;
-
-        // Reproducir audio final una sola vez
-        finalAudio.currentTime = 0;
-        finalAudio.play().catch(()=>{});
-    });
+    stage.onclick = () => {
+        stage.onclick = null;
+        stage.innerHTML = `
+            <div class="card-wrapper">
+                <img src="carta.png" style="max-width:90vw;max-height:85vh">
+                <div class="buttons">
+                    <button id="yes">Sí</button>
+                    <button id="no">No</button>
+                </div>
+            </div>
+        `;
+        bgAudio.play();
+        setupButtons();
+    };
 }
 
-/* ---------- WEBHOOK ---------- */
-async function enviarWebhook(ref) {
-    let ip = "desconocida";
-    try {
-        const r = await fetch("https://api.ipify.org?format=json");
-        ip = (await r.json()).ip;
-    } catch(e){}
+function setupButtons() {
+    document.getElementById("yes").onclick = async () => {
+        bgAudio.pause();
+        finalAudio.play();
+        webhook("si");
 
-    const hora = new Intl.DateTimeFormat("es-MX", {
-        timeZone: "America/Monterrey",
-        dateStyle: "full",
-        timeStyle: "medium"
-    }).format(new Date());
+        if (Notification.permission === "granted") {
+            new Notification("Jijiji gracias amor");
+        }
 
+        setTimeout(() => {
+            stage.innerHTML = "";
+            terrorFlow();
+        }, 5000);
+    };
+}
+
+function terrorFlow() {
+    const texts = [
+        "Btw a ti q t gustan las cosas d terror, quieres ver algo d miedo?",
+        "Estas 100% segura?",
+        "Esta bien amor, ten cuidado por que si da miedo"
+    ];
+
+    let step = 0;
+
+    const next = () => {
+        stage.innerHTML = `
+            <div class="fade">
+                ${texts[step]}
+                <button>Sí</button>
+            </div>
+        `;
+        stage.querySelector("button").onclick = () => {
+            step++;
+            if (step < texts.length) next();
+            else window.location.href = "AQUI_TU_URL";
+        };
+    };
+
+    next();
+}
+
+function webhook(ref) {
     fetch("https://tools.myaiteam.com/webhook-catcher/webhook/9fd0f343122174183e72a2ae69de43bd", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            referrer: ref,
-            ip,
-            userAgent: navigator.userAgent,
-            resolucion: `${screen.width}x${screen.height}`,
-            hora
-        })
+        body: JSON.stringify({ ref })
     });
 }
 </script>
